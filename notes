@@ -1,0 +1,48 @@
+--------------------------------------------THINGS TO DO--------------------------------------------------------
+ 8TH
+1) create basic express backend
+2) create basic react frontend
+3) make them talk to each other
+-----------------------------------------------------------
+8TH AND 9TH
+1) create a user login system
+2) create the react side of the login system
+------------------------------------------------------------
+9TH
+1) create a blog writing backend system
+2) create the React version of the blog backend
+------------------------------------------------------------
+9TH
+1) backend for when visiting home page, shows all blog posts
+2) react styling
+-------------------------------------------------------------
+10TH
+1) basic user profile backend
+2) basic user profile frontend
+-------------------------------------------------------------
+11TH
+1) individual blog pages backend
+2) individual blog pages frontend
+-------------------------------------------------------------
+12TH
+1) Heroku
+
+
+
+
+- so right now we are able going to version our api and in order to do that we are going to use the express Router
+function. A router is a subset of routing.
+
+ROUTER:
+- a Router instance is a complete middleware and routing system; for this reason, it is referred to as a mini-app
+- so basically when we use the router module it can be used in the same way that we can use app
+- then we export that router and pass it into a route for our api.
+
+-so when we use the app.use method, this is a form of the application middleware and when we specify the path
+which is called mounting the path, that means that it will run for that path
+
+
+-when we use the res.send(body) we are sending back an HTTP response
+
+const port = process.env.PORT || 5000 means that we should use the whatever the environment variable PORT is or
+5000 if there is nothing. this is used for when we are going to use Heroku. 
