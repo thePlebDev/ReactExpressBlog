@@ -1,26 +1,28 @@
 --------------------------------------------THINGS TO DO--------------------------------------------------------
  8TH
-1) create basic express backend
-2) create basic react frontend
-3) make them talk to each other
+(DONE) 1) create basic express backend
+(DONE) 2) create basic react frontend
+(DONE) 3) make them talk to each other
 -----------------------------------------------------------
 8TH AND 9TH
-1) create a user login system
+1) create a user login system backend
+    - set up connection to mongoDB (done)
+    - set up user schema and authentication
 2) create the react side of the login system
 ------------------------------------------------------------
-9TH
+9-10TH
 1) create a blog writing backend system
 2) create the React version of the blog backend
 ------------------------------------------------------------
-9TH
+10TH
 1) backend for when visiting home page, shows all blog posts
 2) react styling
 -------------------------------------------------------------
-10TH
+11TH
 1) basic user profile backend
 2) basic user profile frontend
 -------------------------------------------------------------
-11TH
+12TH
 1) individual blog pages backend
 2) individual blog pages frontend
 -------------------------------------------------------------
@@ -45,4 +47,165 @@ which is called mounting the path, that means that it will run for that path
 -when we use the res.send(body) we are sending back an HTTP response
 
 const port = process.env.PORT || 5000 means that we should use the whatever the environment variable PORT is or
-5000 if there is nothing. this is used for when we are going to use Heroku. 
+5000 if there is nothing. this is used for when we are going to use Heroku.
+
+
+REACT
+- right now we are going to use the react router dom. This lets us create a single page application where we can
+dynamically rewrite the current web page with new data from the web server instead of having to reload the entire
+webpage. very bueno
+- router allows our applicaiton to navigate between different components, changing the browser URL, modifying the browser
+history and keeping the UI state in sync
+<Router>: Keeps the UI in sync with the URL
+<Link>: Renders a navigation link
+<Route>: Renders a UI component depending on the URL
+
+- so the main idea of the Router is to create a history object and this object lets us easily manage session
+history anywhere Javascript runs. lets us manage the history stack, navigate and persist state between sessions
+
+NESTED REACT ROUTER ROUTES:
+-when a component is rendered by the router, threee porperties are passes as parameters:
+1) match
+2) location
+3) history
+
+- when there is a match between the router's path and the URL location, a match object is created with infromation
+about the URL and the path, so there are properties on this object:
+1) params: key/value pairs parsed from the URL corresponding to the parameters
+2)isExact: true, if the entire URL was matched (no trailing characters)
+3) path: the path pattern used to match
+4) url: the matched portion of the URL
+
+- so <Switch> is a router matcher like <Route>. When a Switch is rendered it searches through its children <Route />
+elements to find one whose path matches the current URL. When it finds one it renders that <Route> and ignores all others
+- if no <Route> is rendered than the <Switch> renders nothing
+
+CALLING THE EXPRESS BACKEND
+- so it looks like we just going to have to do some calling with the fetch API
+
+fetch() method takes one mandatory argument, the path to the resource you want to fetch. It returns a Promise
+that resolves to the Response to that request, whether it is sucessful or not. You can also optionally pass
+in an init options as the second argument.
+- by default the fetch API uses the GET method
+
+- so I think I am going to use hooks for my server access and we are going to rely on the useEffect hook
+
+USE EFFECT HOOK:
+- this lets us preform side effect in functional components. Data fetching, setting up a subscription and manually
+changing the DOM in React components are all examples of side effects. there are two types of effects, those
+that require clean up and those that do not
+
+- effects without clean up is code that runs after React has updated the DOM. things like Network requests, manual
+DOM mutations, and logging are common examples of effects that don't require a clean up, we can say this becasue
+we can run these actions and then forget about them.
+
+- so we want to make a request to our server api and that means it would be a request without clean up becasue we
+can run the code and then forget about it
+- in normal React we would put these in componentDidMount and componentDidUpdate
+
+- when we use the useEffect hook we are telling React that we need to do something after the render. we pass use
+effect a function and REACT will call that function after performing the DOM updates.
+-so for us we want to add the fetch call inside of the useEffect hook
+
+- so when we are going to run our useEffect hook we are telling React that we want it to run the function that is passed
+into the useEffect hook after the DOM is updated
+- by defualt, effects run after every completed render, but you can choose to fire them only when certain values have
+changed.
+
+- ok so what we are going to build is an API server and then use a library to communicate to make requests to/from
+the api dynamically
+
+- so what we need to do is set up a connection to mongoDB with mongoose, create a user schema and then be able to
+authenticate them.
+
+- to handle HTTP POST requests in Express.js  we need to install the middleware called body-parser. it extracts
+the entire body portion of an incoming request stream and exposes it on req.body.
+- the body-parser module parses the JSON, buffer,string and URL encoded data submitted using HTTP POST
+request
+
+- we are going to connect MongoDB with express using mongoose. that is now DONE
+
+SCHEMA:
+-a mongoose schema is a configuration object for a mongoose model. a schemaTYpe is then a configuration object for
+an individual property. A SchemaType says what type a given path should have, whether it has any getters/setters
+and what values are valid for that path
+
+so then once we have created our model
+
+
+MAKING THE PASSWORD SAFE:
+-to make sure our password is safe we are going to apply a one-way hash to it using the bcrypt algorithm
+- Hashing is a one way function(a mapping). it's irreversible we apply the secure hash algorithm and you
+cannot get the original string back. the most that we can do is to generate what is called a collision, that
+is finding a different string that provides the same hash. Cryptographically secure hash algorithms are designed
+to prevent the occurence of collisions
+- so basically a hash is a one way where a string gets turned into a jumble of stuff and the only way we can
+get a same answer is with a collision but good Hashing algorithms are made to avoid this
+- you can attack a secure hash by using a rainbow table, which can be couteract by applying a salt to the hash
+before storing it
+- a salt is random data that is used as additional input to a one-way function
+
+- so we put in this confusing code for hashing the password and add it to the pre methods on the schema so that
+it runs every time it a user is created.
+- then we have to write code to compare the real password to a password guess. When a user logs in, we will need
+to make sure the password they typed is correct.
+
+- we use the genSalt(rounds, callback ) which is a function that will be used to salt the data, for ours we
+put 10 and that is actually the default. we also give it a callback which will be fired when the salt
+has been generated. the callback will recieve an error and result variable. if there is an error then we return
+the error
+- when the genSalt function gets ran it gets called with the rounds and callback, the callback gets and error
+and the result, the result is the generated salt
+- if there is no error then we run the hash function will run. the hash function, is given data,salt, progress
+callback
+- the data is the password to be encrypted, the salt is the from the last callback which is the generated salt
+- the progress is a callback to be called during the hash calculation to signify progress. this is the noop
+function which is the function expression that is assigned to the variable noop()
+- it also gets a callback function to be fired once the data has been encrypted, the callback is called with
+two parameters. the first is an error that will detail any errors and the second is the result, this will
+provide the encrypted form of the data
+
+- then after the encryption is done we have to create a function that compares the password entered with the
+password that is in the database. this will be done with the bcrypt function called compare.
+- the compare function gets called with data, encrypted and a callback function. The data parameter is the
+data to be compared to the encrypted data.
+- encrypted is the encrypted data to compare. the callback function will be fired once the data has been compared
+and it takes an error and result parameter. the result is a boolean value to determine if the data and the
+encrypted data are matching
+
+-so in theory our database User Schema should be working
+- so now we are creating the actual signup route with passport
+
+
+- Ya I dont really know what is going to happen but I will try
+
+- so to test that everything is working I need to make a post request to '/v1/signup' and the body on that request needs
+to have a password and a username
+- so lets just do a quick read up on the request body.
+
+-the request object represents the HTTP request and has properties for the request query string, parameters, body
+HTTP headers, and so on
+- the request body contains key-value pairs of data submitted in the request body. by default it is undefined
+and is populated when we use body-parsing middleware
+
+- so I seem to be having troubles with the basic routing.Routing refers to how an application responds to
+a client request to a particular endpoint, which is a URL and a specific HTTP request method (GET,POST, and so on)
+
+- so right now I am going to create some vailidation for the form on the front end
+
+REACT FORM VALIDATION:
+
+- forms have two main types of event handlers
+1) onSubmit
+2) onChange
+- since every form has these event handlers, we should be able to write a custom React Hook to handle these
+events
+
+- a custom Hook is a Javascrip tfunciton whose name starts with 'use' and that may call other hooks
+
+- for every change in state we want to run our validation function we can simply create field value varibles
+with useState() and then we pass those values into the useEffect dependency array so that it only runs when
+those values change
+
+- the first thing we need to do is store all the form state in out custom hook
+- we need to get those valued from the forms first
