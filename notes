@@ -209,3 +209,109 @@ those values change
 
 - the first thing we need to do is store all the form state in out custom hook
 - we need to get those valued from the forms first
+- I really need to read up on the regular expressions
+
+REGULAR EXPRESSIONS:
+  - so I think that my regular expression would go something like this /[^a-zA-Z][0-9]$/
+
+
+
+THE VALIDATION HOOK:
+  -we create the a custom hook to do validation.
+  - so the premise is pretty easy actually simple. we just want to validate the information that we put in and have the errors
+  be returned.
+  - so we create our own hook and call it useForm and then we create the states, we need states for the inputs, this will make
+  the component controlled and this will give us access to the values that are put into the inputs of the from.
+  - we have useState and we create an object out of it and call that object values, that object will have properties that are
+  the values that we want for our schema.
+  - we also create an object for the errors and have errors object mirrors the values that are in the other object.
+
+  - so that seems pretty straight forword instead of creating individual values for the states we can make them alot cleaner and
+  turn them into an object. the same goes with the errors. So when creating a custom hook for validation we should create a
+  object that has properties that correlate to the values that are in our form. so if we have a form that has inputs like
+  date,name,age and lastname. We would use the useState to create a values object that has the properties of date, name, age and
+  lastname. Then we would use another useState hook to create an error state and that would mirror the properties that are
+  on the other useState function.
+  -then we create the most important funciton that we have when creating a form, that is the function that is called when the
+  onChange method is called. We create the handleChange funtion, the only parameter is takes is one and it is the event.
+  - inside that function we then use object destructoring to pull the name and value from the target and then we call the
+  setValue funciton. setValue({...value,[name]:value}) this will use the spread operator to make sure we add the new name and
+  value to the state and not completly delete the old state. We will add the [name]:value to the value object, the so the name will
+  be what we have set for that current input, make sure that the name value is the same as the property name in the value object
+  the value will be what is typed in the input.
+  - so we will create somethign like this
+
+            const handleChange = (event)=>{
+              const{name,value} = event.target
+              setValues({...values,[name]:value})
+            }
+  - the creation of the handleChange function will make the inputs a controlled component and that is needed for React forms
+
+  - so then we have the handleSubmit function, this will get ran everytime that a form is submitted. the first thing that we
+  need to do on this function is to call preventDefault(), this will prevent the form from automatically submitting
+  - then we call the serError hook, this is the one that we created right after the values hook. so we call set error, but
+  we give it a function as a parameter and that funciton is given the values object.
+  - the function that we give the setErrors function is called validate login, the premise of that is pretty simple too, all
+  it does is return an object that will contain the errors that we have and that object is then used with the call of setErrors
+  - the validateLogin function is defined seperatly in a different file to promote an module code base. it takes a parameter
+  called value and that is actually just the values object that we have created in our custom hook. So the parameter object
+  will be value and that value will contain properties that are the values from the inputs that are on the form.
+  - in the validateLogin we check all those properties on the value object to see if they meet our standard. if they do not then
+  we add to the error object that will be returned.
+  -so if the values.password is less than 10 characters in length it we will add to the error.password:'password too short'
+  and that will be in the returned error object. We do this for every property that is added on the values object.
+  - so that should be everything, then on the customHook called Useform we return, the values object, the errors object and the
+  handleChange and handleSubmit function.
+
+
+CREATING THE CUSTOM HOOK:
+  - we have created the values and error hooks, then we need to create the handleChange and handleSubmit functions
+  - when we create the handleChange funciton we need to make sure that the name we get is the same as the name that we
+  have put in the value object.
+  - then we call the setValue function and use the spread operator to make sure we dont overwrite the old vlaues.
+      setValues({...values,[name]:value})
+  - so I think that is everything for the handleChagne function, we can then move on to the handleSubmit function and we pass it two
+  parameters, the parameters will be event and a function called validate login. we will use event to prevent the default action
+  -we will use the validateLogin function and pass it into the setErrors hook, the validate funciton will be called with the values
+  obect and return an errors object. This errors object will be used by setErrors to update the errors object.
+  - we have created all of the checks that we are going to run, if any of them fail, they will add to the errors object that will
+  be returned from the ValidateLogin function and used by the setErrors function.
+
+  - so now that the custom hook is created we import it to the form component
+  - we import it to the component and use obejct destructoring from the funciton that is ran with the parameter of validate function
+  - we get the values,errors, handleChange and handleSubmit. the values will be put in the value place of the input so we can
+  have a controlled input.
+  - the errors object will be put under the respected inputs, if there is no errror than nothing will show. handleChange and
+  handleSubmit will be put in their respected positions
+
+  - now we are adding a stage called is submitting
+  - this is done with the useEffect hook, through this we are checking to see if the errors object is empty, if it
+  is then we are going to rend the request, if it is not, then we are going to do nothing.
+
+  - so the first thing that we are going to do for the submitting stage is create a state called is submitting and set
+  the inital value to false but when the handleSubmit function is called we change the value to true.
+  - then we use the useEffect hook. we will put the errors object in its dependency array this means that it will get called
+  any time that the errors object gets called. Initialy we will have the error object empty with no properties.
+  - to check to see if the errors object is empyt we will use Object.keys(errors).length, this will strip all of
+  the keys off the object and put them into an array, if there are no keys, then the length will be 0.
+  - we want the errors array to be zero so that we can send a request to the backend.
+  - we made the errors object initial empty this is ok, because the validatLogin funciton will repopulate the object if there
+  is any errors.
+
+  - so the first thing that we do is import the useEffect hook, then we turn the errors object to an empty object, initialy
+  - then we use the useEffect hook and put the errors object in the dependency arrray. The next step is to create a new state
+  called is submitting and set the inital value to false, this will get turned to true when we fire the handleSubmit function
+
+  - in the useEffect function we need to check if the errors object is empty, we will do this by doing
+  Object.keys(errors).length === 0 this will see if the errors object is empty or not, the we will also check is isSubmitting
+  is false or true, we want it to be true, this will just be done with a && operator, the the whole thing will work like this
+          Object.keys(errors).length ===0 && isSubmitting{
+            sendRequest()
+          }
+ - so this is checking to see if the errors object is empty and if isSubmitting set to True. If both of these conditions are met
+ then we will send the request to the backend. in our program this will be a fetch request. For right now we are going to only send
+ the userName and the password.
+
+SENDING THE POST REQUEST:
+  - so this has me a little confused but I am just going to send a post request with fetch and see what happens.
+  

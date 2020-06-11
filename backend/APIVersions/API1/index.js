@@ -18,8 +18,9 @@ apiV1.get('/test',(req,res)=>{
 apiV1.post("/signup", function(req,res,next){
   // const username = req.body.username;
   // const password = req.body.password;
-  const {user,psw} = req.body
-  console.log(user,psw)
+  // const {user,psw} = req.body
+  // console.log(user,psw)
+  console.log(req.body.username)
   res.send('TESTING TO MAKE SURE EVERYTHING WORKS')
 
 
