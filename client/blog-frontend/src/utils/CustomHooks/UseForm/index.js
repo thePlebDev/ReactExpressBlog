@@ -1,5 +1,5 @@
 import { useState,useEffect } from 'react';
-
+import axios from 'axios';
 
 const useForm = (validateLogin)=>{
   const [values,setValues]= useState({username:'',password:'',passwordRepeat:''})
@@ -24,16 +24,11 @@ const useForm = (validateLogin)=>{
   useEffect(()=>{
     if(Object.keys(errors).length ===0 && isSubmitting){
       console.log('request sent')
-      fetch("v1/signup",{
-        method: 'post',
-        body:JSON.stringify({
-          username: values.username,
-          password: values.password
-        })
-      }).then(response=> console.log(response))
+      axios.post('/v1/signup', values)
+      .then(res=>console.log(res.data)) // printing out the info we get
       .catch(error=>console.log(error))
     }
-  },[errors])
+  },[errors,isSubmitting,values])
 
 
   return{

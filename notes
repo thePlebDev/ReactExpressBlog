@@ -8,7 +8,7 @@
 1) create a user login system backend
     - set up connection to mongoDB (done)
     - set up user schema and authentication
-2) create the react side of the login system
+(DONE) 2) create the react side of the login system
 ------------------------------------------------------------
 9-10TH
 1) create a blog writing backend system
@@ -314,4 +314,79 @@ CREATING THE CUSTOM HOOK:
 
 SENDING THE POST REQUEST:
   - so this has me a little confused but I am just going to send a post request with fetch and see what happens.
-  
+  - The post request needs to be to v1/signup. so that means we make the fetch call to that endpoint
+
+  - A Requets instance represents the request piece of fetch call. By passing fetch a
+  - the bodyParser object exposes various factories to create middlewares. All middlewares will polute the req.body
+  property with the parsed body when the Content-Type request header matches the type option, or an empty object
+  if there is no body to parse, the Content-type was not matched or an error occured.
+  - so my body is empty that means that I could have one of three problems, there is no body to parse, the
+  Content-Type was not matched or an error occured
+  - I think my problem is probably the content-type in the request header
+
+  bodyParser.json([options]) returns middleware that only parses json and looks at the requests where the content-Type header
+  matches the type option.
+  - a new body object containing the parsed data is populated on the request object after the middleware
+  (ie, req.body)
+
+  bodyParser.urlencoded([options])
+  - Returns middleware that only parses urlencoded bodies and only looks at requests where the Content-Type header
+  matches the type option. This parser accepts only UTF-8 encoding of the body and supports automatic inflation of
+  gzip and deflate encodings
+  - a new body object containing the parsed data is populated on the request object after the middleware
+  req.body. This object will contain key-value pairs, where the value can be a string or array
+  when extended is false, or any type (when extended is true).
+  - our extended is set to true so which means that the req.body can be of any type.
+  - so I need to read up on the content-type header
+
+  CONTENT-TYPE HEADER:
+    -is used to indicate the media type of the resource.
+    - in requests like a post, the client tells the server what type of data is actually sent. I think for our
+    body-parser we need to set the content-type header to, Content-Type:text/html; charset=UTF-8
+
+    - by default Axios serializes the object to JSON using the JSON.stringify() funciton, if the second
+    parameter is an object, then axios also sets the content-type header to applciation/json
+    - I have decieded to read more on the API stuff
+
+  EXPRESS API:
+  - the fundamentals of an express api are pretty basic, they take a request, parse it and respond
+  with a JSON object and an HTTP status code. we will use middleware and routing to take requests and parse
+  them, and youll use Express's convience to respond to requests
+  - so we will use middleware to parse the incoming data and then we will use express to make the response
+  to the request
+  -so I finally fixed it, turns out that axios automatically puts everything into a json content header and
+  we just have to set the bodyParser to JSON like this bodyParser.json() this will allow us to accept axios's
+  JSON data.
+
+  - so the dependency array is yelling at me for not having the right things inside of it. so lets read up on that
+
+  USEEFFECT API:
+    - if we use the array optimization, we should make sure that it includes all the values from the component
+    scope(such as props and state) that change over time and that are used by the effect. if we don't include
+    everything in the dependency array then we will be referencing stale values from previous renders.
+
+
+MONGOOSE:
+  - we can use a low-level friver fro MongoDB but what we really want to use is an object document mapper (ODM).
+  the offically supported ODM for MongoDB is mongoose
+  - mongoose attempts to strike a balance. it introduces schemas and models, it is what will give our database some
+  structure.
+  - the mongoose findOne function returns an instance of Mongoose's query class. The query class represents a raw CRUD
+  operation that you may send to MongoDB. it provides a chainable interface for building up more sophisticated
+  queries
+  - a mongoose query is a thenable, meaning that they can have a then() funciton. this means that we can use the
+  .then() and the catch() method. so we can go Model.find().then().catch()
+
+STORING THE PASSWORD:
+  - so to keep the passwords safe, we will apply a one-way hash to it using the brypt algorithm
+  - once we have defined our schema, we will define a pre-save action. Before we save our model to the database
+  we will run that code and it will hash the password
+  - ok so I think I have everything set up, now the only thing I have to do is run the function to see if it works
+
+  - I have ran into an error where nothing is working, I think that It is happening due to something on the
+  client end. that was weird because now everything is working again. very strange.
+
+  - so now that we have that figured out we should be able to just submit the data and see what happens. I forgot
+  that I needed to call .save on the new model
+
+  -our new problem is that the request gets sent but there is no response 
