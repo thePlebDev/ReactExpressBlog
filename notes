@@ -389,4 +389,302 @@ STORING THE PASSWORD:
   - so now that we have that figured out we should be able to just submit the data and see what happens. I forgot
   that I needed to call .save on the new model
 
-  -our new problem is that the request gets sent but there is no response 
+  -our new problem is that the request gets sent but there is no response
+  - ok so we are getting a duplication key error message,
+  - I think that the problem lies with the fact that what I using a async request
+  - so I need to look at the
+
+ASYNC PROGRMMING:
+  - do to javascript single thread nature, only one thing can happen at a time. we can get around this blocking
+  by using asynchronous code, this can be done with callbacks and new promises.
+  callbacks:
+    -these are functions that are specified as arguments when calling a function which will start executing code
+    in the background. when the background code finishes running, it cals the callback function to let us know
+    that the work is done.
+    - so a callback will be used when we have a async action and then have a function that will be fired once that
+    action is done.
+    - when we pass a callback function as an argument to another function we are only passing the fucntion's reference
+    as an argument, this just means that the function is not called immediately
+    - it should be noted that not all functions are asny
+
+  promises:
+    -a promise is an object that represents the completion or failure of the async operation.
+    - the then() blocks contain a callback function that will run if the previous operation is successful.
+    - each then() block recieves that input from the previous one, each then() returns another promise.
+    - this is what allows us to chain multiple then blocks
+    - the catch() block runs if any of the .then() blocks fail
+
+  The event queue:
+    - async operations like promises are put into an event queue, which runs after the main thread has finished
+    processing. the queued operations will complete as soon as possible then return their results to the
+    Javacsript enviroment
+
+ASYNC AND AWAIT:
+  -the async keyword, is put infron of a function declaration to turn a function into an async function.
+  - An async function is on that expects the posibility of the await keyword which will invoke asynchronous code
+  - this will mean that invoking the function noew returns a promise
+  -to actually consume the value returned when the promise fullfills we can sue the .then() blocks
+  - the async keyword is added to funcitons to tell them to return a promise rather than direcly returning a value
+  await:
+    -await only works inside async functions. this can be put infront of any async function to pause the code
+    on that line until the promsie fullfills, then reutrn the resulting value
+    - we can use await when calling any function that returns a Promsie. including Web API funcitons
+
+- so the async bug was actually just created by me trying to make things more clever than they need to be
+- to fix it I just simplified things by deleting a bunch of code.
+
+
+PASSPORT:
+  - passport is authentication middlware for Node. it is designed to serve a singular purpose, authenticate requests
+  authentication:
+    -authentication refers to verifying a users' identities. That is they are who they sau they are
+  authorization:
+    -authorization refers to determining what a user is authorized to access, modify or view
+
+  - usually authentication comes first and then authorization is determined
+  - so passport is used for robust authentication module for NODE/ EXpress
+  - passport is for authentication and authentication is checking to see who the user is.
+  - passport is base on the idea on authentication strategies, including a local stragegy if we don't want
+  to use a third party which right now we don't
+  - with third party authentication, our app never recieves a password
+  - when we use passport, our app is responsible for 4 things
+  - passport is designed to serve a singular purpost:authenticate requests. so basically we drop in passport write a
+  little bit of code to wire up the routes and we will be ok
+  - passport doesnt dicate how to authenticate users, it only provides helpful boilerplate code, we could use
+  passport to sign into google and twitter, facebook and more third party happens
+  - when setting up Passport, we need to do three things
+  1) set up the Passport middleware:
+  2) Tell Passport how to serialize and deserialize users:
+  3) Tell Passport how to authenticate users:
+
+  - so we need to isntall the middleware, tell it how to serialize and deserialize users and how to authenticate
+  users
+  - to initialize Passport we will need to set up three officail Express middlewares, a third party middleware and
+  then two Passport middlewares
+  1) body-parsers: parses HTML forms
+  2) cookie-parser: handles the parsing of cookies from browsers and is required for user sessions
+  3) express-session: stores user sessions across different browsers
+  4) connect-flash: shows error messages
+  4) passport.initialize: initialize the Passport module
+  5) passport.session: Handles Passport sessions
+
+  SESSION SECRET:
+    -this secret is a key that is used for signing and/ or encrypting cookies set by the application to
+    maintain session state
+    - in practice this is often what prevents users from pretending to be someone they're not.
+    -cookies are the most common way for web applciations to persist state(like the current logged in user )
+    across distinct HTTP requests.
+    - well alot of bad things can be done with an easy session secret but I am just going to use the one that
+    is infront of me for right now
+
+- there are 3 options that we pass to express-session
+1)secret: allows each session to be encrypted from the client. this deters hackers from hacking into users
+cookies, as noted we should use a secure bunch of randomly genreated stuff but we have not
+
+2)resave: is an option that is required by middleware. when it is set to true, the session will be updated
+even when it hasnt been modified
+
+3)saveUnitialized: is another requried option. this resets sessions that are unitialized
+
+-so when we are using express sessions we need to set the secret, resave which when set to true will be
+updated even when it hasn't been modified, idk what that means and we set the saveUnitialized to true
+this will reset session that are unitialized
+
+
+SERIALIZATION AND DESERIALATION:
+  -passport needs to know how to serialize and deserialize users. In other words we need to translare a
+  user's session into an actual user object and vice-versa
+
+  - in a typical we application, the credentails used to authenticate a user will only be transmitted during
+  the login request. If authentication succeeds, a session will be established and maintained via a cookie
+  in the user's browser
+
+  - each subsequent request will not contain credentials, but rather the unique cookie that identifies the
+  the session. In order ro support login sessions, Passport will serialize and deserialize user instances
+  to and from the session.
+
+  - credentials used to authenticate the user will only be sent during the login process.If that succeds then
+  we will get a cookie in the users browser
+  - then each request that follows will not have a the users info, just the cookie instead, this cookie will
+  be used to identify the session. Passport will then need to serialize and deserialize user instances to and
+  from the session.
+  -so we will need to translate a user's session into an actual user object and vice-versa
+
+  -because our user models have a unique _id property, we will use that as our translation
+
+
+
+PASSPORT:
+  - so when we make a post request to the login endpoint of our url we are going to run passport.authenticate and
+  with that we are going to use the local stragety that we defined in the passport folder
+
+  - so when we are using passport we first need to define a stragety for passport. the way that we define this
+  stragety is with passport.use() and then we define the stragety in the method
+
+  -so since passport is automatically setup to recieve a template engine, we have to create a custom callback to
+  create a custom callback to work around that. When we run passport.authenticate, what we have to do is pass
+  authenticate a custom callback that will return json data based on the response from the server.
+
+  authenticate:
+    -authenticating requests is as simple as calling passport.authenticate() and specifying what stragety
+    to employ. the info argument is optional and it will contain additional details provided by the stragety's
+    verifying callback
+
+  strategies:
+    - passport uses what are termed strageties to authenticate requests. Strageties range from verifying a username
+    and password, delegated authentication using OAuth or federated authentication using OpenID
+    - before we use passport.authenticate, we must set up a stragety
+    - strategies, and their configuration, are supplied via the use() function.
+    - when using the custom callback, if it fails to authenticate, then the user will be set to false.
+    -at the current moment I do not have a verify callbakc because the main purpose of one is to find the user
+    that possesses a set of credentails.
+
+  Verify Callback:
+    - strategies require what is know as a verifying callback. The purpose of a varify callback is to find the user
+    that possesses a set of credentials
+    - when passport authenticates a request, it patses the credentials contained in the request. it then invokes the
+    verify callback with those credentials as arguments. If the credentials are valid, the verify callback invokes
+    done to supply passport with the user that authenticated.
+
+    - so every stragety must have a verifying callback, the whole point of this thing to is find a user that
+    possesses a set of credentials.
+    -when passport authenticates a request is parses the credentials that are in the request and then it incokes the
+    verufying callback with those credentials as arguments. so pretty much passport will grab those credentials
+    and then run the verifying callback, wich will try to find the user that possess those credialtials.
+    - if the credentials are valid, the verifying callback invokes done and supply Passport with the user that
+    authenticated.
+    - so done only gets called if the user was found
+
+
+    - so passport.authenticate is specifying which strategy to employ. so when we see the passport.authenticate(),
+    it is telling passport what stragety to employ
+
+    -if authentication fails, passport will respond with 401 Unauthorized status, and any additional route
+    handlers will not be called
+
+    - strageties will have to be defined before they are used with the passport.authenticate() function
+
+    configure:
+      - there are three  piecies that need to be configured to use Passport for authentication
+        1): Authentication strategies
+        2): Application middleware
+        3): Sessions(optional)
+
+    - strategies are used to authenticate requests. we can create and configure a stragetie inside of the use()
+    function.
+    - strageties require what is called a verify callback and that callback is used to find the user that
+    possesses a set of credentials
+    - when Passport authenticates a request, it parses the redentials contained in the request. it then invokes the
+    verify callback with those credentials as arguments.
+    - so basically when the passport.authenticate() is ran it will look for what stragety is used, then go into
+    that stragety and parses the credentials in the request, it then calls the verify callback with the credentials
+    and the point of the verify callback is to find a user with certain credentials.
+    - if the credentials are valid, the verify callback invokes done to supply Passport with the user that
+    authenticated
+    - so passport.authenticate gets called and then it looks for the stragety that was defined with the
+    passport.use funciton and the credentails get parsed and then the verify callback is used to identify
+    if there is a user with those credentials, if the user is found, then the done function is called with the
+    authenticated user.
+
+    -if credentials are valid we call the done function with null and user:done(null,user),
+
+    - don is an internal PassportJS function, we pass it two arguments
+
+    - so what I need to do is figure out what done is sending and how to handle what it is sending when we
+    have no user
+    -ok so when we call the done function in our stragety we are giving it three arguments, error, user and
+    info which is an object and it can contain any aditional information
+
+    - so for use this is what is currently happening, we are going to do the following
+    1) call passport.authenticate('login'callbackFunc)
+    2)go into the pre-specified stragety that we defined with the use() method and called login. THis function
+    will parse the user and password automatically from the request.
+    3) call the verify callback in the stragety. this will use a findOne({}) function to see if the user with
+    the credentials is actually there, we also give findOne({},callbackFunc(err,user)) a callback function that will run
+    with either a error message or a user object if the user was authenticated.
+    4) based on what is returned we then run the done(err,user,{})method with a error object, the authrnticated user
+    or a message object, which can be filled with anything.
+    5) what is returned from the done function is then given to the callback function in user.passport
+
+
+RESPONSE:
+  - reposne object represent the Http response that an express app sends when it get an HTTP request.
+  -so when we send an HTTP request object we expect to get an HTTP response object.
+  - express will automatically append the COntent-Type and the COntent-length headers for the response
+  - so res.send and res.json are the same, thing one just sends plain text and the other sends json, they
+  both send data and end the response.
+
+
+- So i need to figure out what is happening when  I try to submit a user.
+
+CREATING A USER WHERE THE USERNAME ALREADY EXISTS:
+  - so when we send a request to the signup route, we are going to get the username and password out of
+  the request body. we will then run a findone query on the database to see if the user already exists or not
+  if the user does not exist then we will create is with a new scema and save it.
+  -if the username already exists then we should get back a user already exists message. so lets try that out
+  - so that works
+
+CREATING A NEW USER:
+  - we ran into a bug here but I think that it will be easy to work out with a redirect, so we will deal with that
+  later. the create user is working fine. Now we have to checkout if the login routes work
+
+
+LOGIN A USER:
+  -passport is authenticattion middleware for node. it is designed to serve a singular purpose:authenticate requests
+  - when we set up passport we will need to do three things
+  1) set up Passport middleware. This is easy
+  2) tell passport how to serialize and deserialize users. THis is a short amount of code that effectvely
+  translates a user's session into an actual user object. I think this is the session part that I am still a little
+  confused about
+  3) Tell Passport how to authenticate users.
+
+SERIALIZATION AND DESERIALATION:
+  -passport needs to know how to serialize and deserialize users. we will need to translare a user's session into
+  an actual user object and vice-versa.
+  - if authentication suceeds, a session will be established and maintined via a cookie set in the user's browser
+  - then each request will not ontain credentials, but rather the unique cookie that identifies the session
+  - in order to support login sessions, Passport will serialize and deserialize user instances to and from the
+  session
+  - to use the serialize and deserialize sessions we will have to call passport.serialize and passport.deserialize
+  - if login(authentication) succeds a session will be established and maintained via a cookei set in the user's
+  browser, so that means that this will have to happen after the stragety is performed by the passport.authenticate()
+
+  - so bascially all this boils down to making requests to the backend and having an API respond in kind to the
+  request that we have sent to it. Really not that hard when you think about it.
+
+  - so we are making a request to the login endpoint with that values attached. that will then run the
+  passport.authenticate middleware that we have on the endpoint, it will parse off the username and the password
+  automatically and then run the verify callback to see if the user is in the database or not. Then depending
+  of if there is a user or not and if the password matches or not, the done function will be run and the done method wil
+  returnt he error object, the user object and the info object back to the function that is on the
+  passport.authenticate middleware.
+
+REDIRECTING WITH THE WITH THE REACT ROUTER DOM:
+  - so it looks like we can just use the redirect component that react-router provides for us.
+  - the real workhorse of React ROuter is the history library. Under the hook, it is what is keeping track
+  of session history for React Router. When a component is rendered by React ROuter, that component is passed three
+  different props, location,match and history. the history has a bunch of fanct properties on it but we are only
+  going to use the hsitory.push().What it does is it pushes a new entry into the history stack, aka redirects the user
+  to another route. so we would go props.history.push('/') this would redirect us to the home page
+
+  - so the primary way we navigate in React ROuter is by using a <Redirect /> component
+  - whenever somthign is rendered with React Router it is passed 3 props, location, history and match
+
+
+
+  -serialize will add the user into passport as a session
+
+EXPRESS SESSIONS:
+  - HTTP is a stateless, in order to associate a request to any other request, we need a way to store user
+  data between HTTP requests. Cookies and URL parameters are both suitable ways to transport between request.
+  Cookies are URL parameters are both suitable ways to transportdata between the client and the server but both
+  are readable and on the client side.
+  - sessions solve this problem. we assign the client an ID and it makes all further requests using that ID. information
+  associated with the client is stored ont he server linked to this ID
+  - the session middleware handles all things for us. like creating the session, settin the session cookie and
+  creating the session objct in req object.
+  - when we make a request form the same client again, we will have their session infromation stored with us
+  (assuming that the server was not restarted)
+  - so we install cookie-parser and session
+  - so what we want to happen is that we the user gets created we want a session to be created so that we can use
+  that session to validate against and check the user.
