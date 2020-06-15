@@ -688,3 +688,43 @@ EXPRESS SESSIONS:
   - so we install cookie-parser and session
   - so what we want to happen is that we the user gets created we want a session to be created so that we can use
   that session to validate against and check the user.
+  - so we have the session creation when the server is sent a request.
+  - so what do we know so far? we know that HTTP is a stateless protocall so if we want to persist data we will have
+  to use sessions
+  - we want to store the users ID so that we can query the users ID to display different infromation about that user
+  - the session is attached to the request, so you can access it using req.session
+  - so we need to create a middleware that will be used for authenticating our users
+  - lets do a quick review on what the heck middleware is, I think that are just function that can be used or routes
+  or not and they recieve req,res,next
+  middleware:
+    - I was right, thats literaly what middleware is. They are functions that have access to the request and
+    response objects and the next function. if it does not end the request, response cycle then it must call the
+    next function.
+
+  - now that I have a little better idea on what is happening with sessions, I think I need to better understand
+  the serialize and deserialize process. Then I think I need to understand what we are doing with the sessions like when
+  are we creating the IDs that will persist
+
+DESERIALIZE AND SERIALIZE:
+  - so it appears that the serialize and the deserialize may be the peeps behind the cookies.
+  - so the user id that we provide the done function is saved in the session and later used to retirieve
+  the whole objcet via the deserializeUser function.
+  - the serializeUser determines which data of the user obecjt should be stored int he session. The result of
+  the serializeUser determines which data of the user object should be stored int he session. The result
+  of the serializeUser method is attached to the session as req.session.passport.user
+  - so the serializeUser will add the nesessary data to the session object and the deserializeUser will remove
+  it and use it to see if the user is authenticated or not
+
+  - we are going to take an identifying piece of information from the user, which will be the user id and put that
+  into a cookie and then that cookie will be used for authentication purposes
+  - so the serializeUser will be the function that will take the info form the UserID and stuff it into a cookie
+  - deserialize works the opposite way, it takes the id form the cookie and then checks to see if that user is in the data
+  base and then authrnticates it
+
+  - just to make thigns super clear, this is what is going to happen when the whole thing kicks off.  The serializeUser
+  is what will put the users data into the session. so This is what passport is using to store the data inside of the session
+  - that would mean that the deserialize will do the oposite, the whole user object will be retured thanks to the help
+  of the id that it will get from the session
+
+  - so when we log our user into the app we want to create a session for them. session can be thought of as
+  non-permanent data storage 

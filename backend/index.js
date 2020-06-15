@@ -22,10 +22,13 @@ app.use(cookieParser());
 app.use(session({
   secret:'TKRv0IJs=HYqrvagQ#&!F!%V]Ww/4KiVs$s,<<MX',
   resave:true,
-  saveUnitialized:true
+  saveUnitialized:false,
+  cookie:{}
 }));
+
+//initialize passport
 app.use(passport.initialize());
-app.use(passport.session())
+app.use(passport.session());
 
 //API VERSIONING
 app.use('/v1',apiV1)

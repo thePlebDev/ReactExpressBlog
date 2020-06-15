@@ -6,8 +6,9 @@ const UserModel = require('../../Models/Users')
 
 const apiV1 = express.Router()
 
-
-apiV1.get('/login',function(req,res){
+apiV1.get('/',function(req,res){
+  console.log(req.user)
+  console.log(req.isAuthenticated())
   res.send('on the login page')
 })
 
@@ -31,10 +32,18 @@ apiV1.post('/login',(req,res,next)=>{
         found: false
       })
     }
-    return res.json({
-      message: 'User is now authenticated!!!',
-      found: true
-    });
+    req.login(user,function(err){
+      if(error){
+        return res.status(500).json({
+          message:'Ooops,something happened',
+          error: error.message || 'internal server error'
+        });
+      }
+      return res.json({
+        message: 'User is now authenticated!!!',
+        found: true
+      });
+    })
 
   })(req,res,next)
 })
@@ -50,7 +59,7 @@ apiV1.post("/signup", async function(req,res,next){ //THIS WHOLE THING IS NOT GE
      if(doc){
        res.json({message:"User already exists"})
      }else{
-       //IF THE USERNAME DOES NOT EXISTS
+       //IF THE USERNAME DOES NOT EXIST, CREATE NEW ONE
        const newUser = new UserModel({username,password})
        newUser.save()
        .then(()=>{res.json({message:"User Created"})})

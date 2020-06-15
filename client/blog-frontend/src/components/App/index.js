@@ -5,6 +5,7 @@ import Home from '../Home'
 import SignUpForm from '../SignUpForm'
 import Login from '../LoginForm'
 import NotFound from '../NotFound'
+import Profile from '../Profile';
 
 
 const App = ()=>{
@@ -15,6 +16,7 @@ const App = ()=>{
         <Route exact path='/' component={Home} />
         <Route exact path='/signup' component={SignUpForm} />
         <Route exact path='/login' component={Login} />
+        <Route exact path='/profile' component={Profile} />
         <Route path='*' component={NotFound} />
       </Switch>
     </div>

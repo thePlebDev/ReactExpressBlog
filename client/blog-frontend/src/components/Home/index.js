@@ -4,14 +4,14 @@ import React,{ useState,useEffect } from 'react'
 const Home = ()=>{
 const[state,setState] = useState('this')
 
-  // const getList =()=>{
-  //   fetch('v1/test')
-  //   .then(doc=>console.log(doc))
-  //   .catch(err => console.log(err))
-  // }
+  const getList =()=>{
+    fetch('v1/')
+    .then(doc=>console.log(doc))
+    .catch(err => console.log(err))
+  }
 
   useEffect(()=>{
-  //  getList()
+    getList()
   });
 
   return(
